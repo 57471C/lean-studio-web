@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <g transform="matrix(0.705515,0,0,0.706015,0.799167,0.799168)">
+        <path d="M100,31.161L100,68.839C100,86.037 86.027,100 68.817,100L31.183,100C13.973,100 0,86.037 0,68.839L0,31.161C0,13.963 13.973,0 31.183,0L68.817,0C86.027,0 100,13.963 100,31.161Z" style="stroke:rgb(0,112,192);stroke-width:1.42px;"/>
+    </g>
+    <g transform="matrix(0.640533,0,0,0.72,16.406197,0.099915)">
+        <path d="M64,40L80,32L80,68L64,60L64,40Z" style="fill:rgb(0,112,192);fill-rule:nonzero;"/>
+    </g>
+    <g transform="matrix(0.72,0,0,0.72,33.032783,42.381896)">
+        <g transform="matrix(1,0,0,1,-17.953865,-0.138744)">
+            <g transform="matrix(25,0,0,25,42.8,0)">
+            </g>
+            <text x="0px" y="0px" style="font-family:'VarelaRound-Regular', 'Varela Round';font-size:25px;fill:white;">L  S</text>
+        </g>
+    </g>
+    <g transform="matrix(0.72,0,0,0.72,-2.460386,1.422)">
+        <circle cx="53" cy="54" r="3" style="fill:rgb(0,112,192);"/>
+    </g>
+    <g transform="matrix(0.933419,0,0,0.933419,-3.503984,-10.571032)">
+        <path d="M64,36.571L64,63.429C64,68.16 60.16,72 55.429,72L28.571,72C23.84,72 20,68.16 20,63.429L20,36.571C20,31.84 23.84,28 28.571,28L55.429,28C60.16,28 64,31.84 64,36.571Z" style="fill:none;stroke:rgb(128,128,128);stroke-width:2.68px;"/>
+    </g>
+</svg>
