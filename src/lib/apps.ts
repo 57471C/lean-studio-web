@@ -15,6 +15,8 @@ export interface AppInfo {
 	status: AppStatus;
 	features: string[];
 	openSource?: boolean;
+	externalUrl?: string;
+	ctaLabel?: string;
 }
 
 /** Commercial core of the suite */
@@ -118,5 +120,7 @@ export const SUPPORT_APPS: AppInfo[] = [
 		status: "available",
 		openSource: true,
 		features: ["Local-only", "Annotations that bake in", "No accounts"],
+		externalUrl: "https://speeddf.com",
+		ctaLabel: "Visit speeddf.com",
 	},
 ];

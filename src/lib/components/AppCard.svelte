@@ -13,8 +13,12 @@
 	};
 </script>
 
-<article
-	class="group relative flex flex-col rounded-2xl border border-border bg-surface-1/80 p-6 transition hover:-translate-y-0.5 hover:border-white/15"
+<svelte:element
+	this={app.externalUrl ? "a" : "article"}
+	href={app.externalUrl}
+	target={app.externalUrl ? "_blank" : undefined}
+	rel={app.externalUrl ? "noopener noreferrer" : undefined}
+	class="group relative flex flex-col rounded-2xl border border-border bg-surface-1/80 p-6 transition hover:-translate-y-0.5 hover:border-white/25 focus:outline-none focus:ring-2 focus:ring-white/20"
 	style="box-shadow: 0 0 0 1px color-mix(in srgb, {app.accent} 12%, transparent);"
 >
 	<div class="mb-5 flex items-start justify-between gap-3">
@@ -56,7 +60,22 @@
 		{/each}
 	</ul>
 
-	{#if app.openSource}
+	{#if app.externalUrl}
+		<div class="mt-auto pt-6 flex items-center justify-between gap-3">
+			<span
+				class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all group-hover:brightness-125"
+				style="background: color-mix(in srgb, {app.accent} 18%, transparent); border: 1px solid color-mix(in srgb, {app.accent} 40%, transparent); color: {app.accent};"
+			>
+				{app.ctaLabel ?? "Visit speeddf.com"}
+				<svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor">
+					<path fill-rule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0L14.5 6.34v4.41a.75.75 0 001.5 0v-6.5a.75.75 0 00-.75-.75h-6.5a.75.75 0 000 1.5h4.41L4.69 13.72a.75.75 0 000 1.06z" clip-rule="evenodd" />
+				</svg>
+			</span>
+			{#if app.openSource}
+				<span class="text-[10px] uppercase tracking-wider text-text-secondary/80">Open source · MIT</span>
+			{/if}
+		</div>
+	{:else if app.openSource}
 		<p class="mt-5 text-[10px] uppercase tracking-wider text-text-secondary/80">Open source · MIT</p>
 	{/if}
-</article>
+</svelte:element>
