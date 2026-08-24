@@ -1,4 +1,4 @@
-import { json } from "@sveltejs/kit";
+import { json, error } from "@sveltejs/kit";
 import {
 	corsHeadersForOrigin,
 	getAllowedOrigin,
@@ -7,8 +7,17 @@ import {
 import type { RequestHandler } from "./$types";
 
 const OWNER = "57471C";
-const REPO = "LS-Video";
-const USER_AGENT = "lean-studio-lsvideo-updater";
+
+const APPS: Record<string, { repo: string; userAgent: string }> = {
+	lsvideo: {
+		repo: "LS-Video",
+		userAgent: "lean-studio-lsvideo-updater",
+	},
+	speeddf: {
+		repo: "speedDF",
+		userAgent: "lean-studio-speeddf-updater",
+	},
+};
 
 export const OPTIONS: RequestHandler = async ({ request }) => {
 	return new Response(null, {
@@ -16,7 +25,15 @@ export const OPTIONS: RequestHandler = async ({ request }) => {
 	});
 };
 
-export const GET: RequestHandler = async ({ fetch, setHeaders, request }) => {
+export const GET: RequestHandler = async ({ fetch, setHeaders, request, params }) => {
+	const appName = params.app?.toLowerCase();
+
+	if (!appName || !APPS[appName]) {
+		error(404, "App not found");
+	}
+
+	const { repo, userAgent } = APPS[appName];
+
 	const origin = request.headers.get("origin");
 	const allowed = getAllowedOrigin(origin);
 	if (allowed) {
@@ -26,9 +43,9 @@ export const GET: RequestHandler = async ({ fetch, setHeaders, request }) => {
 	try {
 		const result = await getLatestJsonFromGitHubRelease({
 			owner: OWNER,
-			repo: REPO,
+			repo: repo,
 			assetName: "latest.json",
-			userAgent: USER_AGENT,
+			userAgent: userAgent,
 			fetch,
 		});
 
@@ -41,7 +58,7 @@ export const GET: RequestHandler = async ({ fetch, setHeaders, request }) => {
 			headers: { "content-type": "application/json" },
 		});
 	} catch (err: unknown) {
-		console.error(`Error fetching updater manifest for ${OWNER}/${REPO}:`, err);
+		console.error(`Error fetching updater manifest for ${OWNER}/${repo}:`, err);
 		return json({ error: "Internal Server Error" }, { status: 500 });
 	}
 };
