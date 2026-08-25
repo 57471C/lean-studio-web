@@ -25,7 +25,7 @@ Living map of the Lean.Studio product family. Update when apps ship, rename, or 
 
 | App | Repo / site | Role |
 |-----|-------------|------|
-| **LS.Video** | https://github.com/57471C/LS-Video | Media player + hybrid linear/NLE: markers, loops, filmstrip, batch trim/export. **Video companion for TimeStudy**; also stands alone. |
+| **LS.Video** | https://github.com/57471C/LS-Video · feed `https://lean.studio/lsvideo/latest.json` | Media player + hybrid linear/NLE: markers, loops, filmstrip, batch trim/export, per-clip volume. **Video companion for TimeStudy**; also stands alone. **Current line: v0.6.7** (2026-08). |
 | **speedDF** | https://github.com/57471C/speedDF · https://speeddf.com | Local-only PDF markup, forms, annotations. Separate brand; same suite story. |
 
 ---
@@ -72,6 +72,21 @@ Shared contract so every Lean.Studio / suite desktop app updates the same way. R
 
 **Proxy pattern:** SvelteKit (or equivalent) route fetches `releases/latest` → finds asset named `latest.json` → returns body with short cache (e.g. ~5 min). Prefer a GitHub token on the edge to avoid unauthenticated API rate limits.
 
+### Install vs updater artifacts
+
+| Purpose | Artifact |
+|---------|----------|
+| **First install / manual upgrade** | Platform installer (macOS **DMG**, Windows **NSIS**, Linux **AppImage/deb**) |
+| **In-app updater** | Platform archive referenced in `latest.json` (e.g. macOS **`*.app.tar.gz`**) |
+
+Users on builds **before** the updater/CSP floor must install once from the DMG (or equivalent); they cannot self-update into the feed.
+
+### LS.Video updater floor (important)
+
+- **v0.6.7** is the first line known to boot the updater module and reach the feed under a correct CSP stack.
+- **≤ v0.6.6** may block updater boot (`script-src` inline boot) and/or WebView `connect-src` to lean.studio — those builds **cannot** reliably self-update. **Manual install of ≥ 0.6.7 once**, then Cancel / Now / When I close toasts for later versions.
+- Align **`index.html` meta CSP `connect-src`** with `tauri.conf.json` (include `https://lean.studio`, `https://lean.studio/*`, and GitHub download hosts if JS ever fetches them). Multiple CSPs are intersected; a tight meta tag overrides a looser Tauri CSP for WebView `fetch`. Native `updater.check()` uses Rust HTTP and is not blocked by WebView CSP, but console diagnostics and any JS fetch will fail if meta is wrong.
+
 ### App requirements (every Tauri product)
 
 1. Cargo + npm: `tauri-plugin-updater` + `tauri-plugin-process`
@@ -88,6 +103,7 @@ Shared contract so every Lean.Studio / suite desktop app updates the same way. R
    - Optional: critical/forced → auto install + relaunch
    - Optional settings: “check for updates on launch”
 10. `.gitignore`: `*.key`, `.tauri/`, never commit private keys
+11. Externalize any updater boot script (no inline `<script type="module">`) so `script-src 'self'` does not block init
 
 ### Apple / ffmpeg (media apps)
 
@@ -107,6 +123,16 @@ Shared contract so every Lean.Studio / suite desktop app updates the same way. R
   - Legacy project extensions `.tmv` / `.tmvz` still openable; primary is `.lsv` / `.lsvz`
 - **Do not** reintroduce full time-study feature set into LS.Video; integration belongs in TimeStudy ↔ Video contracts.
 
+### LS.Video current capabilities (v0.6.7)
+
+| Area | Behaviour |
+|------|-----------|
+| **Master vs clip audio** | Footer volume/mute = **master** (monitor only, not baked into export). Timeline **per-clip** vertical faders + mute (DAW-style, one per row). Heard level ≈ `master × clipGain`. |
+| **Export audio** | Uses **clip** gain/mute only. Muted or ~0 gain → FFmpeg **`-an`** (strip track, not silent audio). |
+| **Timeline performance** | Pan does not full-regen filmstrip/waveform. Zoom: live layout / stretch; **deferred** filmstrip regen after settle; `verify_and_prepare_video` **probe cache** for repeat opens. |
+| **Launch args** | Ignore CLI noise tokens (e.g. `tauri` under `tauri dev`); only real media/project paths. |
+| **View modes** | Cold start Normal; media launch Miniplayer; Cinema Esc → Miniplayer. |
+
 ---
 
 ## H.265 / hard media (knowledge concentration)
@@ -119,7 +145,7 @@ Shared contract so every Lean.Studio / suite desktop app updates the same way. R
 | Audio-only (mp3, etc.) | **Skip** proxy; play directly |
 | Unsafe containers (avi, mkv, wmv, flv) | Proxy |
 | No web-safe video line in probe | Proxy |
-| UNC network paths (`\\server\share\...`) | Preserve UNC; only strip `\\?\` extended prefixes |
+| UNC network paths (`\\server\\share\\...`) | Preserve UNC; only strip `\\?\\` extended prefixes |
 | Filmstrip / waveform | Custom canvas; skip on audio-only; generation token avoids stale thumbs |
 
 **TimeStudy** (as of this map) **cannot yet rely on the same H.265 path**. Options when pivoting:
@@ -146,7 +172,7 @@ Agents working on TimeStudy video playback should read LS.Video `ARCHITECTURE_NU
 
 | App | Notes |
 |-----|--------|
-| LS.Video | `com.leanstudio.lsvideo`, productName `LS.Video`, feed `/lsvideo/latest.json` |
+| LS.Video | `com.leanstudio.lsvideo`, productName `LS.Video`, feed `/lsvideo/latest.json`, **v0.6.7** current |
 | speedDF | Separate product/site; don’t force LS.* naming in the binary without a deliberate rebrand |
 | LS.TimeStudy | *Fill: identifier, repo, version, update feed* |
 
@@ -162,6 +188,7 @@ Agents working on TimeStudy video playback should read LS.Video `ARCHITECTURE_NU
 - [ ] Shared design tokens across suite
 - [ ] Per-app updater keypairs + secrets checklist for commercial apps
 - [ ] “Check updates on launch” setting parity across apps
+- [ ] Align LS.Video `index.html` meta `connect-src` with `tauri.conf` (suite CSP checklist)
 
 ---
 
@@ -177,4 +204,4 @@ Agents working on TimeStudy video playback should read LS.Video `ARCHITECTURE_NU
 
 ---
 
-*Living document. Owner should amend anything missing or wrong. Updater section added 2026-08-16 after LS.Video v0.6.5 feed went live.*
+*Living document. Owner should amend anything missing or wrong. Updater section added 2026-08-16 (v0.6.5 feed); refreshed 2026-08-25 for LS.Video **v0.6.7** floor, volume model, and timeline performance notes.*
