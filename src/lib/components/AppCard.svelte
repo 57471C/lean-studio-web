@@ -11,13 +11,17 @@
 		beta: "Beta",
 		coming: "In development",
 	};
+
+	const isExternal =
+		!!app.externalUrl &&
+		(app.externalUrl.startsWith("http://") || app.externalUrl.startsWith("https://"));
 </script>
 
 <svelte:element
 	this={app.externalUrl ? "a" : "article"}
 	href={app.externalUrl}
-	target={app.externalUrl ? "_blank" : undefined}
-	rel={app.externalUrl ? "noopener noreferrer" : undefined}
+	target={isExternal ? "_blank" : undefined}
+	rel={isExternal ? "noopener noreferrer" : undefined}
 	class="group relative flex flex-col rounded-2xl border border-border bg-surface-1/80 p-6 transition hover:-translate-y-0.5 hover:border-white/25 focus:outline-none focus:ring-2 focus:ring-white/20"
 	style="box-shadow: 0 0 0 1px color-mix(in srgb, {app.accent} 12%, transparent);"
 >
@@ -66,7 +70,7 @@
 				class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all group-hover:brightness-125"
 				style="background: color-mix(in srgb, {app.accent} 18%, transparent); border: 1px solid color-mix(in srgb, {app.accent} 40%, transparent); color: {app.accent};"
 			>
-				{app.ctaLabel ?? "Visit speeddf.com"}
+				{app.ctaLabel ?? "Learn more"}
 				<svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="currentColor">
 					<path fill-rule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0L14.5 6.34v4.41a.75.75 0 001.5 0v-6.5a.75.75 0 00-.75-.75h-6.5a.75.75 0 000 1.5h4.41L4.69 13.72a.75.75 0 000 1.06z" clip-rule="evenodd" />
 				</svg>
