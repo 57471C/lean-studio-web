@@ -105,6 +105,8 @@ export const SUPPORT_APPS: AppInfo[] = [
 		status: "available",
 		openSource: true,
 		features: ["Batch trim & export", "Timeline tools", "Feeds LS.TimeStudy"],
+		externalUrl: "/lsvideo",
+		ctaLabel: "View product page",
 	},
 	{
 		id: "speeddf",
