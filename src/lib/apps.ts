@@ -37,6 +37,8 @@ export const CORE_APPS: AppInfo[] = [
 			"Standardised work sheets",
 			"Syncs with LS.Video timelines",
 		],
+		externalUrl: "/timestudy",
+		ctaLabel: "View product page",
 	},
 	{
 		id: "mapper",
