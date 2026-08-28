@@ -48,8 +48,11 @@ export type LatestJsonOptions = {
 
 /**
  * Fetch the `latest.json` (or named) asset from the repo's latest GitHub Release.
- * Uses GITHUB_TOKEN from private env when set (strongly recommended on Cloudflare
- * to avoid unauthenticated API rate limits). Never expose the token to the client.
+ * Uses GITHUB_TOKEN from private env when set (required for private repos).
+ * Never expose the token to the client.
+ *
+ * Private release files must be downloaded via the assets API
+ * (`Accept: application/octet-stream`), not browser_download_url.
  */
 export async function getLatestJsonFromGitHubRelease(
 	options: LatestJsonOptions,
@@ -63,15 +66,13 @@ export async function getLatestJsonFromGitHubRelease(
 		return { ok: true, data: hit.data };
 	}
 
+	const token = env.GITHUB_TOKEN;
+
 	const apiHeaders: Record<string, string> = {
 		Accept: "application/vnd.github+json",
 		"User-Agent": userAgent,
 		"X-GitHub-Api-Version": "2022-11-28",
 	};
-
-	// Prefer private env (SvelteKit). On Cloudflare Pages, set GITHUB_TOKEN in
-	// project → Settings → Environment variables (Production + Preview).
-	const token = env.GITHUB_TOKEN;
 	if (token) {
 		apiHeaders.Authorization = `Bearer ${token}`;
 	}
@@ -95,7 +96,6 @@ export async function getLatestJsonFromGitHubRelease(
 	const asset = release.assets?.find((a) => a.name === assetName);
 
 	if (!asset) {
-		// Clean 404 until the desktop CI attaches latest.json to the release
 		return {
 			ok: false,
 			status: 404,
@@ -103,12 +103,24 @@ export async function getLatestJsonFromGitHubRelease(
 		};
 	}
 
-	const assetRes = await fetch(asset.browser_download_url, {
-		headers: {
-			"User-Agent": userAgent,
-			...(token ? { Authorization: `Bearer ${token}` } : {}),
-		},
-	});
+	const assetHeaders: Record<string, string> = {
+		"User-Agent": userAgent,
+		"X-GitHub-Api-Version": "2022-11-28",
+	};
+	if (token) {
+		assetHeaders.Authorization = `Bearer ${token}`;
+	}
+
+	let assetRes: Response;
+	if (asset.id) {
+		assetHeaders.Accept = "application/octet-stream";
+		assetRes = await fetch(
+			`https://api.github.com/repos/${owner}/${repo}/releases/assets/${asset.id}`,
+			{ headers: assetHeaders },
+		);
+	} else {
+		assetRes = await fetch(asset.browser_download_url, { headers: assetHeaders });
+	}
 
 	if (!assetRes.ok) {
 		return { ok: false, status: 500, error: "Failed to download asset data payload" };
