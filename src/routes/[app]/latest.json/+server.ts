@@ -23,6 +23,26 @@ const APPS: Record<string, { repo: string; userAgent: string }> = {
 	},
 };
 
+const GH_TIMESTUDY_DOWNLOAD =
+	"https://github.com/57471C/LS-TimeStudy/releases/download/";
+const R2_TIMESTUDY_DOWNLOAD = "https://downloads.lean.studio/timestudy/";
+
+type PlatformEntry = { url?: string; signature?: string };
+
+/** Point TimeStudy updater at R2; signatures stay as signed. */
+function rewriteTimeStudyPlatformUrls(data: unknown): unknown {
+	if (!data || typeof data !== "object") return data;
+	const copy = structuredClone(data) as { platforms?: Record<string, PlatformEntry> };
+	const platforms = copy.platforms;
+	if (!platforms) return copy;
+	for (const entry of Object.values(platforms)) {
+		if (entry?.url?.startsWith(GH_TIMESTUDY_DOWNLOAD)) {
+			entry.url = R2_TIMESTUDY_DOWNLOAD + entry.url.slice(GH_TIMESTUDY_DOWNLOAD.length);
+		}
+	}
+	return copy;
+}
+
 export const OPTIONS: RequestHandler = async ({ request }) => {
 	return new Response(null, {
 		headers: corsHeadersForOrigin(request.headers.get("origin")),
@@ -57,8 +77,10 @@ export const GET: RequestHandler = async ({ fetch, setHeaders, request, params }
 			return json({ error: result.error }, { status: result.status });
 		}
 
+		const payload = appName === "timestudy" ? rewriteTimeStudyPlatformUrls(result.data) : result.data;
+
 		setHeaders({ "cache-control": "public, max-age=300" });
-		return json(result.data, {
+		return json(payload, {
 			headers: { "content-type": "application/json" },
 		});
 	} catch (err: unknown) {
