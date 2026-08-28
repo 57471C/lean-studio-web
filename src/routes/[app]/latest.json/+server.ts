@@ -17,6 +17,10 @@ const APPS: Record<string, { repo: string; userAgent: string }> = {
 		repo: "speedDF",
 		userAgent: "lean-studio-speeddf-updater",
 	},
+	timestudy: {
+		repo: "LS-TimeStudy",
+		userAgent: "lean-studio-timestudy-updater",
+	},
 };
 
 export const OPTIONS: RequestHandler = async ({ request }) => {
