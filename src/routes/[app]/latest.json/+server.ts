@@ -21,6 +21,10 @@ const APPS: Record<string, { repo: string; userAgent: string }> = {
 		repo: "LS-TimeStudy",
 		userAgent: "lean-studio-timestudy-updater",
 	},
+	lstext: {
+		repo: "LS-Text",
+		userAgent: "lean-studio-lstext-updater",
+	},
 };
 
 const GH_TIMESTUDY_DOWNLOAD =
